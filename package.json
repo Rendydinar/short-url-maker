@@ -1,0 +1,24 @@
+{
+  "name": "ulrshorter",
+  "version": "1.0.0",
+  "description": "latihan membuat layanan pembuat url yang pendek seperti bitly",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon index"
+  },
+  "author": "r3ndyDinar",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.2.5",
+    "cors": "^2.8.5",
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "mongoose": "^5.8.9",
+    "shortid": "^2.2.15",
+    "valid-url": "^1.0.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossOrigin="anonymous" />
+
+
+    <title>Short Url Maker</title>
+  </head>
+  <body>
+    
+    <div class="container">
+      <div class="card" style="margin-top:5rem;">
+        <div class="card-title">
+          <h4 class="text-center text-uppercase" style="padding: 3rem;">short url maker</h4>
+        </div>
+        <div class="card-body">
+          <div id="message">
+            
+          </div>
+          <form id="form">
+            <div class="form-group">
+              <label for="url">Url</label>
+              <input type="text" class="form-control" id="url" placeholder="Copy The Url In Here...">
+            </div>
+           <button type="submit" class="btn btn-outline-success">Buat <span id="loading"></span></button>
+          </form>
+          <div id="message2"></div>
+          <div id="shortlink"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+    <script>
+      let clipboard = new ClipboardJS('.btn');
+
+      clipboard.on('success', function(e) {
+          console.info('Action:', e.action);
+          console.info('Text:', e.text);
+          console.info('Trigger:', 'copied');
+          document.querySelector('#message2').innerHTML = `
+            <br/>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              Berhasil Mencopy Link!
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          `;
+          e.clearSelection();
+      });
+
+      clipboard.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+      });
+
+    </script>
+    <script>
+      document.querySelector('#form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.querySelector('#message').innerHTML = `<center><img class="img-fluid" src="https://findurdate.com.au/assets/img/ajax.gif"/></center>`   
+        document.querySelector('#shortlink').innerHTML = '';
+
+
+        const longUrl = document.querySelector('#url').value;
+
+        // fetch API to send data into server
+        fetch('http://localhost:5000/api/url/shorten', {
+          method: 'POST',
+          headers : {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body:JSON.stringify({longUrl:longUrl})
+        }).then((res) =>res.json() )
+          .then((data) => {
+
+            if(data.shortUrl) {
+              document.querySelector('#message').innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  Berhasil Membuat Link!
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              `;
+
+              // add copy shortlink into clipboard
+              document.querySelector('#shortlink').innerHTML = 
+              `
+                <input id="foo" value="${data.shortUrl}">
+                <button class="btn" data-clipboard-target="#foo" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <i class="fas fa-clipboard-list"></i>
+                </button> 
+              `;              
+            } else {
+              document.querySelector('#message').innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  Gagal Membuat Link!
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              `
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+      });
+    </script>
+  </body>
+</html>
